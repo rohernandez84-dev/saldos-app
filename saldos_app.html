@@ -45,6 +45,10 @@
   select { cursor: pointer; }
   .importe-wrap { display: flex; align-items: center; gap: 4px; }
   .currency { font-size: 15px; color: var(--muted); font-weight: 500; }
+  .tc-card { display: none; background: #fffbea; border-radius: var(--radius); border: 0.5px solid #f0c040; overflow: hidden; }
+  .tc-card.visible { display: block; }
+  .tc-card .field { background: #fffbea; }
+  .tc-label { font-size: 11px; color: #856404; font-weight: 600; padding: 8px 14px 0; }
   .btn-guardar { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.15s; min-height: 52px; }
   .btn-guardar:disabled { opacity: 0.5; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -158,31 +162,41 @@
       <label>Descripción</label>
       <input type="text" id="descripcion" placeholder="Ej: Supermercado Carrefour" autocomplete="off">
     </div>
-    <div class="field-row card">
-      <div class="field">
-        <label>Forma de pago</label>
-        <select id="formapago">
-          <option value="">Cuenta...</option>
-          <option>Efectivo</option>
-          <option>CA GAL 1</option>
-          <option>CA GAL (U$D)</option>
-          <option>CA ML (AR$)</option>
-          <option>CA ML (U$D)</option>
-          <option>CA SANTANDER</option>
-          <option>CA BBVA (AR$)</option>
-          <option>FIMA GAL (AR$)</option>
-          <option>Cta Corriente</option>
-          <option>Caja Fuerte (Pesos)</option>
-          <option>Caja Fuerte (U$D)</option>
-          <option>Efectivo U$D</option>
-        </select>
+    <div class="field">
+      <label>Forma de pago</label>
+      <select id="formapago" onchange="checkDolar()">
+        <option value="">Cuenta...</option>
+        <option>Efectivo</option>
+        <option>CA GAL 1</option>
+        <option>CA GAL (U$D)</option>
+        <option>CA ML (AR$)</option>
+        <option>CA ML (U$D)</option>
+        <option>CA SANTANDER</option>
+        <option>CA BBVA (AR$)</option>
+        <option>FIMA GAL (AR$)</option>
+        <option>Cta Corriente</option>
+        <option>Caja Fuerte (Pesos)</option>
+        <option>Caja Fuerte (U$D)</option>
+        <option>Efectivo U$D</option>
+        <option>Exterior (Pancho) (U$D)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Importe</label>
+      <div class="importe-wrap">
+        <span class="currency" id="currencySymbol">$</span>
+        <input type="number" id="importe" placeholder="0" inputmode="decimal" min="0">
       </div>
-      <div class="field">
-        <label>Importe (AR$)</label>
-        <div class="importe-wrap">
-          <span class="currency">$</span>
-          <input type="number" id="importe" placeholder="0" inputmode="decimal" min="0">
-        </div>
+    </div>
+  </div>
+
+  <div class="tc-card" id="tcCard">
+    <div class="tc-label">💵 Pago en dólares — ingresá el tipo de cambio</div>
+    <div class="field" style="background:#fffbea">
+      <label>Tipo de cambio (AR$ por U$D)</label>
+      <div class="importe-wrap">
+        <span class="currency">$</span>
+        <input type="number" id="tc" placeholder="Ej: 1250" inputmode="decimal" min="0">
       </div>
     </div>
   </div>
@@ -202,6 +216,7 @@
 
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhdZjSgVRjLaSQbAyuKIUoenja-5tnHtYaM2rRFiOrJl4LGlDfijWi9M14NdxwaSt8UA/exec";
+const CUENTAS_DOLAR = ["CA GAL (U$D)", "CA ML (U$D)", "Caja Fuerte (U$D)", "Efectivo U$D", "Exterior (Pancho) (U$D)"];
 
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('fecha').value = today;
@@ -212,6 +227,13 @@ function setTipo(tipo, el) {
   tipoActual = tipo;
   document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
+}
+
+function checkDolar() {
+  const formapago = document.getElementById('formapago').value;
+  const esDolar = CUENTAS_DOLAR.includes(formapago);
+  document.getElementById('tcCard').classList.toggle('visible', esDolar);
+  document.getElementById('currencySymbol').textContent = esDolar ? 'U$D' : '$';
 }
 
 function showToast(msg, tipo) {
@@ -234,7 +256,7 @@ function renderHistorial() {
         <div class="hist-desc">${h.descripcion || h.formapago || ''}</div>
       </div>
       <div class="hist-amount ${h.tipo === 'Egresos' ? 'egreso' : 'ingreso'}">
-        ${h.tipo === 'Egresos' ? '-' : '+'}$${Number(h.importe).toLocaleString('es-AR')}
+        ${h.tipo === 'Egresos' ? '-' : '+'}${CUENTAS_DOLAR.includes(h.formapago) ? 'U$D ' : '$'}${Number(h.importe).toLocaleString('es-AR')}
       </div>
     </div>
   `).join('');
@@ -246,9 +268,15 @@ async function guardar() {
   const descripcion = document.getElementById('descripcion').value;
   const formapago = document.getElementById('formapago').value;
   const importe = document.getElementById('importe').value;
+  const esDolar = CUENTAS_DOLAR.includes(formapago);
+  const tc = document.getElementById('tc').value;
 
   if (!fecha || !categoria || !importe) {
     showToast('Completá fecha, categoría e importe.', 'err');
+    return;
+  }
+  if (esDolar && !tc) {
+    showToast('Ingresá el tipo de cambio.', 'err');
     return;
   }
 
@@ -259,7 +287,7 @@ async function guardar() {
   btnText.textContent = 'Guardando...';
   spinner.style.display = 'block';
 
-  const payload = { fecha, categoria, tipo: tipoActual, descripcion, formapago, importe: Number(importe) };
+  const payload = { fecha, categoria, tipo: tipoActual, descripcion, formapago, importe: Number(importe), tc: esDolar ? Number(tc) : 1 };
   const url = APPS_SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(payload));
 
   try {
@@ -272,10 +300,14 @@ async function guardar() {
     localStorage.setItem('hist', JSON.stringify(historial));
     renderHistorial();
 
-    showToast('✓ Asiento guardado en Google Sheets', 'ok');
+    showToast('✓ Asiento guardado en fila ' + data.fila, 'ok');
     document.getElementById('descripcion').value = '';
     document.getElementById('importe').value = '';
     document.getElementById('categoria').value = '';
+    document.getElementById('tc').value = '';
+    document.getElementById('formapago').value = '';
+    document.getElementById('tcCard').classList.remove('visible');
+    document.getElementById('currencySymbol').textContent = '$';
   } catch(err) {
     showToast('Error: ' + err.message, 'err');
   } finally {
