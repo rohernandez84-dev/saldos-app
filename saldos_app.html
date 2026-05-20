@@ -51,35 +51,17 @@
     text-align: center; transition: all 0.15s; outline: none;
     display: flex; align-items: center; justify-content: center; gap: 6px;
   }
-  .tipo-btn.egreso.active {
-    background: var(--egreso-bg); border-color: var(--egreso-border); color: var(--egreso-text);
-  }
-  .tipo-btn.ingreso.active {
-    background: var(--ingreso-bg); border-color: var(--ingreso-border); color: var(--ingreso-text);
-  }
-  .card {
-    background: var(--surface); border-radius: var(--radius);
-    border: 0.5px solid var(--border); overflow: hidden;
-  }
-  .field {
-    padding: 10px 14px; border-bottom: 0.5px solid var(--border);
-    display: flex; flex-direction: column; gap: 3px;
-  }
+  .tipo-btn.egreso.active { background: var(--egreso-bg); border-color: var(--egreso-border); color: var(--egreso-text); }
+  .tipo-btn.ingreso.active { background: var(--ingreso-bg); border-color: var(--ingreso-border); color: var(--ingreso-text); }
+  .card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
+  .field { padding: 10px 14px; border-bottom: 0.5px solid var(--border); display: flex; flex-direction: column; gap: 3px; }
   .field:last-child { border-bottom: none; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; }
   .field-row .field { border-right: 0.5px solid var(--border); }
   .field-row .field:last-child { border-right: none; }
-  label {
-    font-size: 10px; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.5px;
-  }
-  input, select, textarea {
-    width: 100%; background: transparent; border: none; outline: none;
-    font-size: 15px; color: var(--text); font-family: inherit;
-    padding: 0; -webkit-appearance: none; appearance: none;
-  }
+  label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; color: var(--text); font-family: inherit; padding: 0; -webkit-appearance: none; appearance: none; }
   select { cursor: pointer; }
-  textarea { resize: none; line-height: 1.4; }
   .importe-wrap { display: flex; align-items: center; gap: 4px; }
   .currency { font-size: 15px; color: var(--muted); font-weight: 500; }
   .btn-guardar {
@@ -91,32 +73,15 @@
     transition: opacity 0.15s; min-height: 52px;
   }
   .btn-guardar:disabled { opacity: 0.5; }
-  .btn-guardar.loading::after {
-    content: ''; width: 18px; height: 18px;
-    border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
-    border-radius: 50%; animation: spin 0.7s linear infinite;
-    margin-left: 6px;
-  }
   @keyframes spin { to { transform: rotate(360deg); } }
-  .toast {
-    display: none; margin-top: -6px;
-    padding: 11px 14px; border-radius: var(--radius-sm);
-    font-size: 13px; font-weight: 500;
-    align-items: center; gap: 8px;
-  }
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  .btn-guardar.loading .spinner { display: block; }
+  .toast { display: none; margin-top: -6px; padding: 11px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; align-items: center; gap: 8px; }
   .toast.ok { display: flex; background: var(--ingreso-bg); color: var(--ingreso-text); border: 0.5px solid var(--ingreso-border); }
   .toast.err { display: flex; background: var(--egreso-bg); color: var(--egreso-text); border: 0.5px solid var(--egreso-border); }
   .historial-section { padding: 0 16px 16px; }
-  .historial-title {
-    font-size: 11px; font-weight: 700; color: var(--muted);
-    text-transform: uppercase; letter-spacing: 0.5px;
-    padding: 4px 0 10px;
-  }
-  .hist-item {
-    background: var(--surface); border-radius: var(--radius-sm);
-    border: 0.5px solid var(--border); padding: 10px 14px;
-    margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
-  }
+  .historial-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 0 10px; }
+  .hist-item { background: var(--surface); border-radius: var(--radius-sm); border: 0.5px solid var(--border); padding: 10px 14px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
   .hist-cat { font-size: 13px; font-weight: 600; }
   .hist-desc { font-size: 12px; color: var(--muted); margin-top: 1px; }
   .hist-amount { font-size: 15px; font-weight: 700; }
@@ -253,7 +218,8 @@
   <div class="toast" id="toast"></div>
 
   <button class="btn-guardar" id="btnGuardar" onclick="guardar()">
-    Guardar asiento
+    <span id="btnText">Guardar asiento</span>
+    <div class="spinner" id="spinner"></div>
   </button>
 
   <div class="historial-section">
@@ -264,8 +230,7 @@
 </div>
 
 <script>
-// ⚠️  REEMPLAZÁ ESTA URL CON LA QUE TE DÉ GOOGLE APPS SCRIPT
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBNbzFf3XGlE5PcznKavwreCyK27v2Z49RoPCIup6K5cbm0Bvz1CAQ3Qvb0HrUAd7AGw/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhdZjSgVRjLaSQbAyuKIUoenja-5tnHtYaM2rRFiOrJl4LGlDfijWi9M14NdxwaSt8UA/exec";
 
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('fecha').value = today;
@@ -282,12 +247,15 @@ function showToast(msg, tipo) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast ' + tipo;
-  setTimeout(() => t.className = 'toast', 3500);
+  setTimeout(() => t.className = 'toast', 4000);
 }
 
 function renderHistorial() {
   const el = document.getElementById('historial');
-  if (!historial.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted);text-align:center;padding:12px 0">Sin movimientos recientes</p>'; return; }
+  if (!historial.length) {
+    el.innerHTML = '<p style="font-size:13px;color:var(--muted);text-align:center;padding:12px 0">Sin movimientos recientes</p>';
+    return;
+  }
   el.innerHTML = historial.slice().reverse().slice(0, 5).map(h => `
     <div class="hist-item">
       <div>
@@ -314,31 +282,30 @@ async function guardar() {
   }
 
   const btn = document.getElementById('btnGuardar');
+  const btnText = document.getElementById('btnText');
+  const spinner = document.getElementById('spinner');
   btn.disabled = true;
-  btn.textContent = 'Guardando...';
+  btnText.textContent = 'Guardando...';
   btn.classList.add('loading');
+  spinner.style.display = 'block';
 
   const payload = { fecha, categoria, tipo: tipoActual, descripcion, formapago, importe: Number(importe) };
 
   try {
-    if (APPS_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyhdZjSgVRjLaSQbAyuKIUoenja-5tnHtYaM2rRFiOrJl4LGlDfijWi9M14NdxwaSt8UA/exec") {
-      await new Promise(r => setTimeout(r, 800));
-      throw new Error("URL no configurada — reemplazá TU_URL_AQUI con tu URL de Apps Script.");
-    }
     const form = new FormData();
     form.append('data', JSON.stringify(payload));
-    const res = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST', body: form
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: form,
+      mode: 'no-cors'
     });
-    const data = await res.json();
-    if (data.status !== 'ok') throw new Error(data.msg);
 
     historial.push(payload);
     if (historial.length > 20) historial.shift();
     localStorage.setItem('hist', JSON.stringify(historial));
     renderHistorial();
 
-    showToast('✓ Asiento guardado en Google Sheets', 'ok');
+    showToast('✓ Asiento enviado a Google Sheets', 'ok');
     document.getElementById('descripcion').value = '';
     document.getElementById('importe').value = '';
     document.getElementById('categoria').value = '';
@@ -346,8 +313,9 @@ async function guardar() {
     showToast('Error: ' + err.message, 'err');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Guardar asiento';
+    btnText.textContent = 'Guardar asiento';
     btn.classList.remove('loading');
+    spinner.style.display = 'none';
   }
 }
 
