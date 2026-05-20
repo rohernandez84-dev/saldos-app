@@ -10,12 +10,8 @@
 <title>Saldos Personales</title>
 <style>
   :root {
-    --bg: #f4f3ef;
-    --surface: #ffffff;
-    --border: rgba(0,0,0,0.1);
-    --text: #1a1a2e;
-    --muted: #6b6b7b;
-    --accent: #1a1a2e;
+    --bg: #f4f3ef; --surface: #ffffff; --border: rgba(0,0,0,0.1);
+    --text: #1a1a2e; --muted: #6b6b7b; --accent: #1a1a2e;
     --egreso-bg: #fce8e8; --egreso-border: #e24b4a; --egreso-text: #a32d2d;
     --ingreso-bg: #eaf3de; --ingreso-border: #639922; --ingreso-text: #3b6d11;
     --radius: 12px; --radius-sm: 8px;
@@ -29,28 +25,13 @@
     }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg); color: var(--text);
-    min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom);
-  }
-  header {
-    background: var(--accent); color: #fff;
-    padding: 52px 20px 20px;
-    position: sticky; top: 0; z-index: 10;
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom); }
+  header { background: var(--accent); color: #fff; padding: 52px 20px 20px; position: sticky; top: 0; z-index: 10; }
   header .sub { font-size: 11px; opacity: 0.6; letter-spacing: 0.8px; text-transform: uppercase; }
   header h1 { font-size: 22px; font-weight: 600; margin-top: 2px; }
   .form { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
   .tipo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .tipo-btn {
-    padding: 11px 8px; border-radius: var(--radius-sm);
-    border: 1.5px solid var(--border);
-    background: var(--surface); color: var(--muted);
-    font-size: 14px; font-weight: 600; cursor: pointer;
-    text-align: center; transition: all 0.15s; outline: none;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
+  .tipo-btn { padding: 11px 8px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.15s; outline: none; display: flex; align-items: center; justify-content: center; gap: 6px; }
   .tipo-btn.egreso.active { background: var(--egreso-bg); border-color: var(--egreso-border); color: var(--egreso-text); }
   .tipo-btn.ingreso.active { background: var(--ingreso-bg); border-color: var(--ingreso-border); color: var(--ingreso-text); }
   .card { background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border); overflow: hidden; }
@@ -60,22 +41,14 @@
   .field-row .field { border-right: 0.5px solid var(--border); }
   .field-row .field:last-child { border-right: none; }
   label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  input, select, textarea { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; color: var(--text); font-family: inherit; padding: 0; -webkit-appearance: none; appearance: none; }
+  input, select { width: 100%; background: transparent; border: none; outline: none; font-size: 15px; color: var(--text); font-family: inherit; padding: 0; -webkit-appearance: none; appearance: none; }
   select { cursor: pointer; }
   .importe-wrap { display: flex; align-items: center; gap: 4px; }
   .currency { font-size: 15px; color: var(--muted); font-weight: 500; }
-  .btn-guardar {
-    width: 100%; padding: 15px;
-    background: var(--accent); color: #fff; border: none;
-    border-radius: var(--radius); font-size: 16px; font-weight: 600;
-    cursor: pointer; font-family: inherit;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: opacity 0.15s; min-height: 52px;
-  }
+  .btn-guardar { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.15s; min-height: 52px; }
   .btn-guardar:disabled { opacity: 0.5; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-  .btn-guardar.loading .spinner { display: block; }
   .toast { display: none; margin-top: -6px; padding: 11px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; align-items: center; gap: 8px; }
   .toast.ok { display: flex; background: var(--ingreso-bg); color: var(--ingreso-text); border: 0.5px solid var(--ingreso-border); }
   .toast.err { display: flex; background: var(--egreso-bg); color: var(--egreso-text); border: 0.5px solid var(--egreso-border); }
@@ -97,7 +70,6 @@
 </header>
 
 <div class="form">
-
   <div class="tipo-row">
     <button class="tipo-btn egreso active" onclick="setTipo('Egresos',this)">↑ Egreso</button>
     <button class="tipo-btn ingreso" onclick="setTipo('Ingresos',this)">↓ Ingreso</button>
@@ -226,7 +198,6 @@
     <div class="historial-title">Últimos guardados</div>
     <div id="historial"></div>
   </div>
-
 </div>
 
 <script>
@@ -286,26 +257,22 @@ async function guardar() {
   const spinner = document.getElementById('spinner');
   btn.disabled = true;
   btnText.textContent = 'Guardando...';
-  btn.classList.add('loading');
   spinner.style.display = 'block';
 
   const payload = { fecha, categoria, tipo: tipoActual, descripcion, formapago, importe: Number(importe) };
+  const url = APPS_SCRIPT_URL + '?data=' + encodeURIComponent(JSON.stringify(payload));
 
   try {
-    const form = new FormData();
-    form.append('data', JSON.stringify(payload));
-    await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: form,
-      mode: 'no-cors'
-    });
+    const res = await fetch(url, { method: 'GET' });
+    const data = await res.json();
+    if (data.status !== 'ok') throw new Error(data.msg);
 
     historial.push(payload);
     if (historial.length > 20) historial.shift();
     localStorage.setItem('hist', JSON.stringify(historial));
     renderHistorial();
 
-    showToast('✓ Asiento enviado a Google Sheets', 'ok');
+    showToast('✓ Asiento guardado en Google Sheets', 'ok');
     document.getElementById('descripcion').value = '';
     document.getElementById('importe').value = '';
     document.getElementById('categoria').value = '';
@@ -314,7 +281,6 @@ async function guardar() {
   } finally {
     btn.disabled = false;
     btnText.textContent = 'Guardar asiento';
-    btn.classList.remove('loading');
     spinner.style.display = 'none';
   }
 }
