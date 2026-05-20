@@ -265,7 +265,7 @@
 
 <script>
 // ⚠️  REEMPLAZÁ ESTA URL CON LA QUE TE DÉ GOOGLE APPS SCRIPT
-const APPS_SCRIPT_URL = "TU_URL_AQUI";
+const APPS_SCRIPT_URL = https://script.google.com/macros/s/AKfycbyBNbzFf3XGlE5PcznKavwreCyK27v2Z49RoPCIup6K5cbm0Bvz1CAQ3Qvb0HrUAd7AGw/exec;
 
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('fecha').value = today;
@@ -321,7 +321,7 @@ async function guardar() {
   const payload = { fecha, categoria, tipo: tipoActual, descripcion, formapago, importe: Number(importe) };
 
   try {
-    if (APPS_SCRIPT_URL === "TU_URL_AQUI") {
+    if (APPS_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyhdZjSgVRjLaSQbAyuKIUoenja-5tnHtYaM2rRFiOrJl4LGlDfijWi9M14NdxwaSt8UA/exec") {
       await new Promise(r => setTimeout(r, 800));
       throw new Error("URL no configurada — reemplazá TU_URL_AQUI con tu URL de Apps Script.");
     }
