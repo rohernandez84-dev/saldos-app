@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>Saldos Personales</title>
+<style>
+  :root {
+    --bg: #f4f3ef;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.1);
+    --text: #1a1a2e;
+    --muted: #6b6b7b;
+    --accent: #1a1a2e;
+    --egreso-bg: #fce8e8; --egreso-border: #e24b4a; --egreso-text: #a32d2d;
+    --ingreso-bg: #eaf3de; --ingreso-border: #639922; --ingreso-text: #3b6d11;
+    --radius: 12px; --radius-sm: 8px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f1a; --surface: #1c1c2e; --border: rgba(255,255,255,0.1);
+      --text: #f0eff5; --muted: #9090a8; --accent: #6c63ff;
+      --egreso-bg: #2d1515; --egreso-border: #e24b4a; --egreso-text: #f09595;
+      --ingreso-bg: #152510; --ingreso-border: #639922; --ingreso-text: #c0dd97;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text);
+    min-height: 100dvh; padding-bottom: env(safe-area-inset-bottom);
+  }
+  header {
+    background: var(--accent); color: #fff;
+    padding: 52px 20px 20px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  header .sub { font-size: 11px; opacity: 0.6; letter-spacing: 0.8px; text-transform: uppercase; }
+  header h1 { font-size: 22px; font-weight: 600; margin-top: 2px; }
+  .form { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .tipo-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tipo-btn {
+    padding: 11px 8px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    text-align: center; transition: all 0.15s; outline: none;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .tipo-btn.egreso.active {
+    background: var(--egreso-bg); border-color: var(--egreso-border); color: var(--egreso-text);
+  }
+  .tipo-btn.ingreso.active {
+    background: var(--ingreso-bg); border-color: var(--ingreso-border); color: var(--ingreso-text);
+  }
+  .card {
+    background: var(--surface); border-radius: var(--radius);
+    border: 0.5px solid var(--border); overflow: hidden;
+  }
+  .field {
+    padding: 10px 14px; border-bottom: 0.5px solid var(--border);
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .field:last-child { border-bottom: none; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; }
+  .field-row .field { border-right: 0.5px solid var(--border); }
+  .field-row .field:last-child { border-right: none; }
+  label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  input, select, textarea {
+    width: 100%; background: transparent; border: none; outline: none;
+    font-size: 15px; color: var(--text); font-family: inherit;
+    padding: 0; -webkit-appearance: none; appearance: none;
+  }
+  select { cursor: pointer; }
+  textarea { resize: none; line-height: 1.4; }
+  .importe-wrap { display: flex; align-items: center; gap: 4px; }
+  .currency { font-size: 15px; color: var(--muted); font-weight: 500; }
+  .btn-guardar {
+    width: 100%; padding: 15px;
+    background: var(--accent); color: #fff; border: none;
+    border-radius: var(--radius); font-size: 16px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: opacity 0.15s; min-height: 52px;
+  }
+  .btn-guardar:disabled { opacity: 0.5; }
+  .btn-guardar.loading::after {
+    content: ''; width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+    margin-left: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast {
+    display: none; margin-top: -6px;
+    padding: 11px 14px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 500;
+    align-items: center; gap: 8px;
+  }
+  .toast.ok { display: flex; background: var(--ingreso-bg); color: var(--ingreso-text); border: 0.5px solid var(--ingreso-border); }
+  .toast.err { display: flex; background: var(--egreso-bg); color: var(--egreso-text); border: 0.5px solid var(--egreso-border); }
+  .historial-section { padding: 0 16px 16px; }
+  .historial-title {
+    font-size: 11px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: 4px 0 10px;
+  }
+  .hist-item {
+    background: var(--surface); border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border); padding: 10px 14px;
+    margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .hist-cat { font-size: 13px; font-weight: 600; }
+  .hist-desc { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .hist-amount { font-size: 15px; font-weight: 700; }
+  .hist-amount.egreso { color: var(--egreso-text); }
+  .hist-amount.ingreso { color: var(--ingreso-text); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="sub">Saldos Personales</div>
+  <h1>Nuevo asiento</h1>
+</header>
+
+<div class="form">
+
+  <div class="tipo-row">
+    <button class="tipo-btn egreso active" onclick="setTipo('Egresos',this)">↑ Egreso</button>
+    <button class="tipo-btn ingreso" onclick="setTipo('Ingresos',this)">↓ Ingreso</button>
+  </div>
+
+  <div class="card">
+    <div class="field">
+      <label>Fecha</label>
+      <input type="date" id="fecha">
+    </div>
+    <div class="field">
+      <label>Categoría</label>
+      <select id="categoria">
+        <option value="">Seleccionar categoría...</option>
+        <optgroup label="Tarjeta de Crédito">
+          <option>01.12. VISA</option>
+          <option>01.13. MASTER CARD</option>
+          <option>01.01. Cuotas</option>
+          <option>01.02. Supermercado</option>
+          <option>01.03. Gastronomía</option>
+          <option>01.04. Combustible</option>
+          <option>01.05. Seguros</option>
+          <option>01.06. Otros</option>
+        </optgroup>
+        <optgroup label="Hogar">
+          <option>03.02. Supermercado</option>
+          <option>03.05. Veterinario</option>
+          <option>03.06. Alquiler</option>
+          <option>03.07. Expensas</option>
+          <option>03.08. Luz</option>
+          <option>03.09. Gas</option>
+          <option>03.11. Limpieza</option>
+          <option>03.14. GCBA</option>
+        </optgroup>
+        <optgroup label="Entretenimiento">
+          <option>04.03. Boliche</option>
+          <option>04.04. Gastronomía</option>
+          <option>04.05. Otros</option>
+        </optgroup>
+        <optgroup label="Auto">
+          <option>06.01. Service</option>
+          <option>06.02. Patente</option>
+          <option>06.04. Lavadero</option>
+          <option>06.05. Estacionamiento</option>
+          <option>06.06. Combustible</option>
+          <option>06.07. Infracciones</option>
+        </optgroup>
+        <optgroup label="Personal">
+          <option>08.00. Telefonía Celular</option>
+          <option>10.01. Gimnasio</option>
+          <option>10.02. Peluquería</option>
+          <option>10.03. Fútbol</option>
+          <option>10.09. Terapia</option>
+          <option>12.04. Farmacia</option>
+          <option>12.06. Ropa</option>
+          <option>12.05. Otros</option>
+        </optgroup>
+        <optgroup label="Ahorros / Inversiones">
+          <option>02.02. Ahorro Mensual</option>
+          <option>11.03. Comisiones Títulos</option>
+        </optgroup>
+        <optgroup label="Vacaciones">
+          <option>30.00. Vacaciones</option>
+        </optgroup>
+        <optgroup label="Préstamos">
+          <option>09.05. Préstamos varios</option>
+          <option>07.01. Papá</option>
+          <option>07.02. Mamá</option>
+          <option>07.03. Pancho</option>
+          <option>07.04. Juan</option>
+        </optgroup>
+        <optgroup label="Ingresos">
+          <option>001. Sueldo</option>
+          <option>003. Variable</option>
+          <option>004. Bono</option>
+          <option>003. Intereses</option>
+          <option>1004. Rentas BONOS</option>
+          <option>004. Ventas</option>
+          <option>005. Otros Ingresos</option>
+          <option>011. Pancho</option>
+          <option>012. Juan</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="field">
+      <label>Descripción</label>
+      <input type="text" id="descripcion" placeholder="Ej: Supermercado Carrefour" autocomplete="off">
+    </div>
+    <div class="field-row card">
+      <div class="field">
+        <label>Forma de pago</label>
+        <select id="formapago">
+          <option value="">Cuenta...</option>
+          <option>Efectivo</option>
+          <option>CA GAL 1</option>
+          <option>CA GAL (U$D)</option>
+          <option>CA ML (AR$)</option>
+          <option>CA ML (U$D)</option>
+          <option>CA SANTANDER</option>
+          <option>CA BBVA (AR$)</option>
+          <option>FIMA GAL (AR$)</option>
+          <option>Cta Corriente</option>
+          <option>Caja Fuerte (Pesos)</option>
+          <option>Caja Fuerte (U$D)</option>
+          <option>Efectivo U$D</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Importe (AR$)</label>
+        <div class="importe-wrap">
+          <span class="currency">$</span>
+          <input type="number" id="importe" placeholder="0" inputmode="decimal" min="0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <button class="btn-guardar" id="btnGuardar" onclick="guardar()">
+    Guardar asiento
+  </button>
+
+  <div class="historial-section">
+    <div class="historial-title">Últimos guardados</div>
+    <div id="historial"></div>
+  </div>
+
+</div>
+
+<script>
+// ⚠️  REEMPLAZÁ ESTA URL CON LA QUE TE DÉ GOOGLE APPS SCRIPT
+const APPS_SCRIPT_URL = "TU_URL_AQUI";
+
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('fecha').value = today;
+let tipoActual = 'Egresos';
+let historial = JSON.parse(localStorage.getItem('hist') || '[]');
+
+function setTipo(tipo, el) {
+  tipoActual = tipo;
+  document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function showToast(msg, tipo) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + tipo;
+  setTimeout(() => t.className = 'toast', 3500);
+}
+
+function renderHistorial() {
+  const el = document.getElementById('historial');
+  if (!historial.length) { el.innerHTML = '<p style="font-size:13px;color:var(--muted);text-align:center;padding:12px 0">Sin movimientos recientes</p>'; return; }
+  el.innerHTML = historial.slice().reverse().slice(0, 5).map(h => `
+    <div class="hist-item">
+      <div>
+        <div class="hist-cat">${h.categoria}</div>
+        <div class="hist-desc">${h.descripcion || h.formapago || ''}</div>
+      </div>
+      <div class="hist-amount ${h.tipo === 'Egresos' ? 'egreso' : 'ingreso'}">
+        ${h.tipo === 'Egresos' ? '-' : '+'}$${Number(h.importe).toLocaleString('es-AR')}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function guardar() {
+  const fecha = document.getElementById('fecha').value;
+  const categoria = document.getElementById('categoria').value;
+  const descripcion = document.getElementById('descripcion').value;
+  const formapago = document.getElementById('formapago').value;
+  const importe = document.getElementById('importe').value;
+
+  if (!fecha || !categoria || !importe) {
+    showToast('Completá fecha, categoría e importe.', 'err');
+    return;
+  }
+
+  const btn = document.getElementById('btnGuardar');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+  btn.classList.add('loading');
+
+  const payload = { fecha, categoria, tipo: tipoActual, descripcion, formapago, importe: Number(importe) };
+
+  try {
+    if (APPS_SCRIPT_URL === "TU_URL_AQUI") {
+      await new Promise(r => setTimeout(r, 800));
+      throw new Error("URL no configurada — reemplazá TU_URL_AQUI con tu URL de Apps Script.");
+    }
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST', body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.status !== 'ok') throw new Error(data.msg);
+
+    historial.push(payload);
+    if (historial.length > 20) historial.shift();
+    localStorage.setItem('hist', JSON.stringify(historial));
+    renderHistorial();
+
+    showToast('✓ Asiento guardado en Google Sheets', 'ok');
+    document.getElementById('descripcion').value = '';
+    document.getElementById('importe').value = '';
+    document.getElementById('categoria').value = '';
+  } catch(err) {
+    showToast('Error: ' + err.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar asiento';
+    btn.classList.remove('loading');
+  }
+}
+
+renderHistorial();
+</script>
+</body>
+</html>
