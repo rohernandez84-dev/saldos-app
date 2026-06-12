@@ -49,6 +49,7 @@
   .tc-card.visible { display: block; }
   .tc-card .field { background: #fffbea; }
   .tc-label { font-size: 11px; color: #856404; font-weight: 600; padding: 8px 14px 0; }
+  .tc-card input { color: #4a3800; font-weight: 700; }
   .btn-guardar { width: 100%; padding: 15px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius); font-size: 16px; font-weight: 600; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.15s; min-height: 52px; }
   .btn-guardar:disabled { opacity: 0.5; }
   @keyframes spin { to { transform: rotate(360deg); } }
@@ -98,52 +99,100 @@
           <option>01.05. Seguros</option>
           <option>01.06. Otros</option>
         </optgroup>
+        <optgroup label="Ahorros / Pago de Deudas">
+          <option>02.01. Pago de Intereses</option>
+          <option>02.02. Ahorro Mensual</option>
+        </optgroup>
         <optgroup label="Hogar">
+          <option>03.01. Mensualidad</option>
           <option>03.02. Supermercado</option>
+          <option>03.03. Jardinería</option>
+          <option>03.04. Otros</option>
           <option>03.05. Veterinario</option>
           <option>03.06. Alquiler</option>
           <option>03.07. Expensas</option>
           <option>03.08. Luz</option>
           <option>03.09. Gas</option>
+          <option>03.10. Cable e Internet</option>
           <option>03.11. Limpieza</option>
+          <option>03.12. Laverrap</option>
+          <option>03.13. AySA</option>
           <option>03.14. GCBA</option>
         </optgroup>
         <optgroup label="Entretenimiento">
+          <option>04.01. Cine</option>
+          <option>04.02. Bar</option>
           <option>04.03. Boliche</option>
           <option>04.04. Gastronomía</option>
           <option>04.05. Otros</option>
         </optgroup>
+        <optgroup label="Viajes">
+          <option>05.01. Combustible</option>
+          <option>05.02. Hoteles</option>
+          <option>05.03. Comidas</option>
+          <option>05.04. Peaje</option>
+          <option>05.05. Pasajes</option>
+          <option>05.06. Taxi, Remis, Uber</option>
+          <option>05.07. Patente</option>
+          <option>05.08. Seguro</option>
+          <option>05.09. Otros</option>
+        </optgroup>
         <optgroup label="Auto">
           <option>06.01. Service</option>
           <option>06.02. Patente</option>
+          <option>06.03. Gastos Varios</option>
           <option>06.04. Lavadero</option>
           <option>06.05. Estacionamiento</option>
           <option>06.06. Combustible</option>
+          <option>06.06. Otros</option>
           <option>06.07. Infracciones</option>
+          <option>06.07. Taxi, Remís</option>
         </optgroup>
         <optgroup label="Personal">
           <option>08.00. Telefonía Celular</option>
           <option>10.01. Gimnasio</option>
           <option>10.02. Peluquería</option>
           <option>10.03. Fútbol</option>
+          <option>10.04. Universidad</option>
+          <option>10.05. Dermatóloga</option>
+          <option>10.06. Paddle</option>
+          <option>10.07. Otros</option>
+          <option>10.08. Pool</option>
           <option>10.09. Terapia</option>
+          <option>12.01. Kiosco</option>
+          <option>12.02. SUBE</option>
+          <option>12.03. Mercado Libre</option>
           <option>12.04. Farmacia</option>
-          <option>12.06. Ropa</option>
           <option>12.05. Otros</option>
+          <option>12.06. Ropa</option>
+          <option>12.07. Perfumes</option>
         </optgroup>
-        <optgroup label="Ahorros / Inversiones">
-          <option>02.02. Ahorro Mensual</option>
+        <optgroup label="Inversiones / Banco">
+          <option>11.01. Tenencia de Bonos</option>
+          <option>11.02. IVA</option>
           <option>11.03. Comisiones Títulos</option>
+          <option>11.04. Comisiones Cta Cte</option>
+          <option>11.05. Otros gastos Bco</option>
         </optgroup>
         <optgroup label="Vacaciones">
           <option>30.00. Vacaciones</option>
         </optgroup>
-        <optgroup label="Préstamos">
+        <optgroup label="Préstamos Bancarios">
+          <option>09.01. Préstamo Corven</option>
+          <option>09.02. Préstamos Galicia</option>
+          <option>09.03. Préstamo PETER</option>
+          <option>09.04. Préstamo Gilera</option>
           <option>09.05. Préstamos varios</option>
+          <option>09.06. Préstamos SANTANDER MOTO</option>
+          <option>09.07. Préstamos BBVA AUTO</option>
+        </optgroup>
+        <optgroup label="Préstamos a Personas">
           <option>07.01. Papá</option>
           <option>07.02. Mamá</option>
           <option>07.03. Pancho</option>
           <option>07.04. Juan</option>
+          <option>07.06. Tío Tito</option>
+          <option>07.07. Ivana</option>
         </optgroup>
         <optgroup label="Ingresos">
           <option>001. Sueldo</option>
@@ -179,6 +228,7 @@
         <option>Caja Fuerte (U$D)</option>
         <option>Efectivo U$D</option>
         <option>Exterior (Pancho) (U$D)</option>
+        <option>CA AUSTRO (U$D)</option>
       </select>
     </div>
     <div class="field">
@@ -219,7 +269,7 @@
 
 <script>
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhdZjSgVRjLaSQbAyuKIUoenja-5tnHtYaM2rRFiOrJl4LGlDfijWi9M14NdxwaSt8UA/exec";
-const CUENTAS_DOLAR = ["CA GAL (U$D)", "CA ML (U$D)", "Caja Fuerte (U$D)", "Efectivo U$D", "Exterior (Pancho) (U$D)"];
+const CUENTAS_DOLAR = ["CA GAL (U$D)", "CA ML (U$D)", "Caja Fuerte (U$D)", "Efectivo U$D", "Exterior (Pancho) (U$D)", "CA AUSTRO (U$D)"];
 
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('fecha').value = today;
